@@ -1,0 +1,2001 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Melexis Agentic AI POC — Salesforce Lightning Mock</title>
+
+  <!-- Lato per Melexis guidelines -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      /* Melexis colors */
+      --mx-blue:#00354B;
+      --mx-green:#65BBA9;
+      --mx-yellow:#EEA320;
+      --mx-red:#DB4140;
+      --mx-char:#3e4242;
+      --mx-steel:#b2c4cb;
+      --mx-bg:#ebebeb;
+
+      /* Salesforce-like neutrals */
+      --sf-page:#f3f2f2;
+      --sf-card:#ffffff;
+      --sf-line:#dddbda;
+      --sf-soft:#f7f7f7;
+      --sf-soft2:#fafaf9;
+      --sf-link:#0176d3;
+
+      --radius:2px;
+      --border:1px solid var(--sf-line);
+
+      --font:"Lato", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body { height:100%; }
+    body{
+      margin:0;
+      background: var(--sf-page);
+      color: var(--mx-char);
+      font-family: var(--font);
+    }
+
+    /* ---------- Global Header (Salesforce Lightning-like) ---------- */
+    .sf-global{
+      background: var(--sf-card);
+      border-bottom: var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .sf-global-inner{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+    .appLauncher{
+      width: 34px; height: 34px;
+      border: var(--border);
+      background: var(--sf-soft2);
+      border-radius: var(--radius);
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      padding: 6px;
+    }
+    .appLauncher span{
+      background: #c9c7c5;
+      border-radius: 1px;
+    }
+    .sf-cloud{
+      width: 28px; height: 28px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--mx-blue), var(--mx-green));
+      border: 1px solid rgba(0,0,0,.06);
+    }
+    .sf-appName{
+      font-weight: 900;
+      color: var(--mx-blue);
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+    .sf-nav{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-right: auto;
+    }
+    .sf-nav a{
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mx-char);
+      text-decoration:none;
+      padding: 6px 8px;
+      border-radius: var(--radius);
+    }
+    .sf-nav a.active{
+      color: var(--mx-blue);
+      border-bottom: 2px solid var(--sf-link);
+      border-radius: 0;
+      padding-bottom: 4px;
+    }
+    .sf-search{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      min-width: 320px;
+      max-width: 520px;
+      flex: 0 1 520px;
+      background: var(--sf-soft2);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 6px 10px;
+    }
+    .sf-search input{
+      width:100%;
+      border:0;
+      outline:none;
+      background: transparent;
+      font-size: 13px;
+    }
+    .sf-icons{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .sf-icon{
+      width: 32px; height: 32px;
+      border: var(--border);
+      background: var(--sf-soft2);
+      border-radius: var(--radius);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 14px;
+      color: #706e6b;
+      user-select:none;
+    }
+    .sf-avatar{
+      width: 32px; height: 32px;
+      border-radius: 999px;
+      background: #f2c57c;
+      border: var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 900;
+      color: #7b4a00;
+    }
+
+    /* ---------- Record Header (Highlights Panel) ---------- */
+    .sf-record-wrap{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 12px 14px 0 14px;
+    }
+    .sf-record{
+      background: var(--sf-card);
+      border: var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+    }
+    .sf-record-top{
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+      padding: 12px;
+      border-bottom: var(--border);
+      background: linear-gradient(180deg, rgba(0,53,75,.04), transparent);
+    }
+    .sf-rec-icon{
+      width: 38px; height: 38px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--sf-soft2);
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 900;
+      color: var(--mx-blue);
+    }
+    .sf-rec-title{
+      min-width: 240px;
+    }
+    .sf-rec-title .obj{
+      font-size: 12px;
+      font-weight: 900;
+      color: #706e6b;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+    .sf-rec-title .name{
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--mx-blue);
+      margin-top: 2px;
+    }
+    .sf-highlights{
+      display:flex;
+      gap: 18px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      margin-left: 10px;
+    }
+    .hl{
+      min-width: 180px;
+    }
+    .hl .k{
+      font-size: 11px;
+      color:#706e6b;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+    .hl .v{
+      margin-top: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mx-char);
+    }
+    .hl .v a{ color: var(--sf-link); text-decoration:none; }
+    .sf-rec-actions{
+      margin-left:auto;
+      display:flex;
+      gap: 8px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .sf-btn{
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--sf-card);
+      font-weight: 900;
+      font-size: 12px;
+      cursor:pointer;
+      color: var(--mx-blue);
+      user-select:none;
+    }
+    .sf-btn.primary{
+      background: var(--sf-link);
+      border-color: var(--sf-link);
+      color: #fff;
+    }
+    .sf-btn:hover{ background: var(--sf-soft2); }
+    .sf-btn.primary:hover{ filter: brightness(0.98); background: var(--sf-link); }
+
+    /* ---------- Path (Stage) ---------- */
+    .sf-path{
+      padding: 10px 12px;
+      background: #e9f2fb;
+      border-top: 1px solid rgba(1,118,211,.15);
+    }
+    .pathRow{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .stage{
+      border: 1px solid rgba(1,118,211,.25);
+      background: #fff;
+      color: var(--mx-char);
+      font-weight: 900;
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      cursor:pointer;
+      user-select:none;
+    }
+    .stage.active{
+      background: var(--mx-blue);
+      border-color: var(--mx-blue);
+      color: #fff;
+    }
+    .stage.done{
+      background: var(--mx-green);
+      border-color: var(--mx-green);
+      color: var(--mx-blue);
+    }
+    .pathRight{
+      margin-left:auto;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+
+    /* ---------- Page Layout (Record Body + Right Sidebar) ---------- */
+    .sf-body{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 12px 14px 16px 14px;
+      display:grid;
+      grid-template-columns: 1fr 360px; /* main + right sidebar */
+      gap: 12px;
+    }
+
+    /* Main content holds your original 2-column (Lead card + Dashboard) */
+    .mx-mainGrid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap: 12px;
+      align-items:start;
+    }
+
+    /* Cards (keep your Melexis-flat look, Salesforce spacing) */
+    .card{
+      background: var(--sf-card);
+      border: var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding: 12px;
+      border-bottom: var(--border);
+      background: var(--sf-soft2);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .6px;
+      color: var(--mx-blue);
+      text-transform: uppercase;
+    }
+    .cardBody{ padding: 12px; }
+
+    .badge{
+      font-size: 11px;
+      font-family: var(--mono);
+      padding: 4px 8px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--sf-card);
+      color: var(--mx-char);
+      white-space: nowrap;
+    }
+
+    .pills{ display:flex; flex-wrap:wrap; gap:8px; }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 9px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--sf-soft2);
+      font-size: 12px;
+      color: var(--mx-char);
+    }
+    .pill b{ font-weight: 900; color: var(--mx-blue); }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .kv{
+      padding: 10px;
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--sf-card);
+    }
+    .k{ font-size: 11px; color: #706e6b; font-weight:900; }
+    .v{ font-size: 13px; margin-top: 6px; color: var(--mx-char); font-weight:700; }
+
+    .hr{ height:1px; background: var(--sf-line); margin: 12px 0; }
+
+    .scoreBar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top: 8px;
+    }
+    .bar{
+      flex:1;
+      height: 10px;
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--sf-soft);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--mx-yellow), var(--mx-green));
+      transition: width .45s ease;
+    }
+    .scoreNum{
+      min-width: 84px;
+      text-align:right;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #706e6b;
+      font-weight: 900;
+    }
+    .small{ font-size: 11px; color: #706e6b; font-weight:700; }
+
+    .timeline{ display:flex; flex-direction:column; gap:10px; }
+    .step{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding: 10px;
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--sf-card);
+    }
+    .dot{
+      width:10px; height:10px;
+      margin-top: 4px;
+      border-radius: 1px;
+      border: var(--border);
+      background: var(--sf-soft);
+      flex: 0 0 auto;
+    }
+    .step.done .dot{ background: var(--mx-green); border-color: var(--mx-green); }
+    .step.running .dot{ background: var(--mx-yellow); border-color: var(--mx-yellow); }
+
+    .step .t{ margin:0; font-size:12px; font-weight:900; color: var(--mx-blue); }
+    .step .d{ margin:3px 0 0 0; font-size:12px; color: var(--mx-char); opacity:.9; line-height:1.35; }
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      padding: 10px 12px;
+      border-top: var(--border);
+      background: var(--sf-soft2);
+    }
+    .btn{
+      padding: 9px 10px;
+      border-radius: var(--radius);
+      border: var(--border);
+      cursor:pointer;
+      font-size: 12px;
+      font-weight: 900;
+      background: var(--sf-card);
+      color: var(--mx-blue);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{ background: var(--sf-soft2); }
+    .btn.good{
+      background: var(--mx-green);
+      border-color: var(--mx-green);
+      color: var(--mx-blue);
+    }
+    .btn.warn{
+      background: var(--mx-yellow);
+      border-color: var(--mx-yellow);
+      color: var(--mx-blue);
+    }
+    .btn.secondary{
+      background: var(--mx-blue);
+      border-color: var(--mx-blue);
+      color: #fff;
+    }
+
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tab{
+      padding: 8px 10px;
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--sf-card);
+      color: var(--mx-blue);
+      cursor:pointer;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .tab:hover{ background: var(--sf-soft2); }
+    .tab.active{
+      background: var(--mx-blue);
+      border-color: var(--mx-blue);
+      color: #fff;
+    }
+
+    .note{
+      font-size: 12px;
+      color: var(--mx-char);
+      opacity: .92;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .list{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+    .item{
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--sf-card);
+      padding: 10px;
+    }
+    .itemTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 6px;
+    }
+    .itemTop .title{
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--mx-blue);
+    }
+
+    .conf{
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--sf-soft2);
+      color: #706e6b;
+      font-family: var(--mono);
+      white-space: nowrap;
+      font-weight: 900;
+    }
+    .conf.good{ border-color: var(--mx-green); }
+    .conf.warn{ border-color: var(--mx-yellow); }
+    .conf.bad{ border-color: var(--mx-red); }
+
+    .mono{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--mx-char);
+      opacity: .92;
+      white-space: pre-wrap;
+      line-height: 1.45;
+    }
+
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 10px;
+    }
+
+    .copyRow{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+
+    .copyBtn{
+      font-size: 12px;
+      font-weight: 900;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--sf-card);
+      color: var(--mx-blue);
+      cursor:pointer;
+    }
+    .copyBtn:hover{ background: var(--sf-soft2); }
+
+    .select{
+      width:100%;
+      background: var(--sf-card);
+      border: var(--border);
+      color: var(--mx-char);
+      padding: 9px 10px;
+      border-radius: var(--radius);
+      outline:none;
+      font-weight: 700;
+    }
+    .select:focus{ outline: 2px solid rgba(101,187,169,.35); outline-offset: 1px; }
+
+    .toast{
+      position:fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--mx-blue);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--mx-blue);
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 30;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    /* ---------- Right Sidebar (Salesforce-like panels) ---------- */
+    .sidebar .cardHeader{
+      background: var(--sf-soft2);
+    }
+    .quickLinks{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .quickLinks a{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 8px;
+      text-decoration:none;
+      color: var(--sf-link);
+      font-weight: 900;
+      font-size: 12px;
+      padding: 6px 8px;
+      border-radius: var(--radius);
+    }
+    .quickLinks a:hover{ background: var(--sf-soft2); }
+    .qlCount{
+      font-family: var(--mono);
+      color: #706e6b;
+      font-weight: 900;
+    }
+
+    
+    /* ---------- Sidebar lead list table ---------- */
+    .sideTableWrap{
+      max-height: 560px;
+      overflow:auto;
+      border-top: var(--border);
+    }
+    .sideTable{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    .sideTable thead th{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--sf-soft2);
+      border-bottom: var(--border);
+      color: var(--mx-blue);
+      text-transform: lowercase;
+      letter-spacing:.2px;
+      font-weight: 900;
+      padding: 10px 10px;
+      text-align:left;
+      white-space:nowrap;
+    }
+    .sideTable tbody td{
+      border-bottom: var(--border);
+      padding: 10px 10px;
+      vertical-align: top;
+      color: var(--mx-char);
+      font-weight: 700;
+      white-space:nowrap;
+    }
+    .sideTable tbody tr:hover{ background: var(--sf-soft2); cursor:pointer; }
+    .sideTable tbody tr.selected{ background: rgba(1,118,211,.08); }
+    .statusPill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 2px 6px;
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--sf-card);
+      font-weight: 900;
+      font-size: 11px;
+      color:#706e6b;
+    }
+    .statusPill.ok{ border-color: var(--mx-green); color: var(--mx-blue); }
+    .deltaPlus{ color: var(--mx-blue); font-weight: 900; }
+
+@media (max-width: 1100px){
+      .sf-body{ grid-template-columns: 1fr; }
+      .mx-mainGrid{ grid-template-columns: 1fr; }
+      .sf-search{ min-width: 220px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Global Header -->
+<div class="sf-global">
+  <div class="sf-global-inner">
+    <div class="appLauncher" title="App Launcher" aria-label="App Launcher">
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </div>
+    <div class="sf-cloud" aria-hidden="true"></div>
+    <div class="sf-appName">Sales</div>
+
+    <nav class="sf-nav" aria-label="Navigation">
+      <a href="#" class="active">Home</a>
+      <a href="#">Accounts</a>
+      <a href="#">Opportunities</a>
+      <a href="#">Contacts</a>
+      <a href="#">Dashboards</a>
+      <a href="#">Reports</a>
+      <a href="#">Tasks</a>
+      <a href="#">Inquiries</a>
+      <a href="#">Visit Reports</a>
+      <a href="#">HLEP Initiatives</a>
+    </nav>
+
+    <div class="sf-search" role="search">
+      <span style="color:#706e6b;font-weight:900;">🔎</span>
+      <input placeholder="Search..." />
+    </div>
+
+    <div class="sf-icons">
+      <div class="sf-icon" title="Notifications">🔔</div>
+      <div class="sf-icon" title="Help">?</div>
+      <div class="sf-avatar" title="User">AT</div>
+    </div>
+  </div>
+</div>
+
+<!-- Record Header (Highlights) -->
+<div class="sf-record-wrap">
+  <div class="sf-record">
+    <div class="sf-record-top">
+      <div class="sf-rec-icon">L</div>
+      <div class="sf-rec-title">
+        <div class="obj">Lead</div>
+        <div class="name" id="recordTitle">—</div>
+      </div>
+
+      <div class="sf-highlights">
+        <div class="hl">
+          <div class="k">Account / Company</div>
+          <div class="v" id="companyNameHL">—</div>
+        </div>
+        <div class="hl">
+          <div class="k">Lead Owner</div>
+          <div class="v"><a href="#" onclick="return false;">(mock) Andrea Renditore</a></div>
+        </div>
+        <div class="hl">
+          <div class="k">Lead Tier</div>
+          <div class="v" id="tierHL">—</div>
+        </div>
+        <div class="hl">
+          <div class="k">Score</div>
+          <div class="v"><span id="finalScoreNumHL">—</span></div>
+        </div>
+      </div>
+
+      <div class="sf-rec-actions">
+        <!-- Lead picker moved into highlight actions (as per record header area) -->
+        <select id="leadSelect" class="select" style="width: 360px; max-width: 44vw;" title="Pick a sample lead"></select>
+        <button class="sf-btn" id="resetBtn">Reset</button>
+        <button class="sf-btn primary" id="runProspectBtnTop">Agent E: Prospect</button>
+      </div>
+    </div>
+
+    <!-- Path (stage-like) -->
+    <div class="sf-path">
+      <div class="pathRow">
+        <div class="stage active" id="stageDiscovery">Discovery</div>
+        <div class="stage" id="stageResearch">Research</div>
+        <div class="stage" id="stageScore">Scoring</div>
+        <div class="stage" id="stageOutreach">Outreach</div>
+        <div class="stage" id="stageDone">Completed</div>
+        <div class="pathRight">
+          <button class="sf-btn primary" onclick="toast('Marked stage complete (mock)')">Mark Stage as Complete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Record Body -->
+<div class="sf-body">
+  <!-- MAIN -->
+  <div class="mx-mainGrid">
+    <!-- Lead Record (left) -->
+    <section class="card">
+      <div class="cardHeader">
+        <div><h2>Lead Record</h2></div>
+        <span class="badge" id="sfIdBadge">SFID: —</span>
+      </div>
+
+      <div class="cardBody">
+        <div class="pills" id="leadPills"></div>
+
+        <div class="grid2">
+          <div class="kv"><div class="k">Company</div><div class="v" id="companyName">—</div></div>
+          <div class="kv"><div class="k">Contact</div><div class="v" id="contactName">—</div></div>
+          <div class="kv"><div class="k">Email</div><div class="v" id="contactEmail">—</div></div>
+          <div class="kv"><div class="k">Source</div><div class="v" id="leadSource">—</div></div>
+          <div class="kv"><div class="k">Country</div><div class="v" id="country">—</div></div>
+          <div class="kv"><div class="k">Tier</div><div class="v" id="tier">—</div></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="k">MCAE (Pardot) Base Score</div>
+        <div class="scoreBar">
+          <div class="bar"><div class="fill" id="baseScoreFill"></div></div>
+          <div class="scoreNum" id="baseScoreNum">—</div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div class="k">Corrected / Enhanced Score (Agent C)</div>
+          <div class="scoreBar">
+            <div class="bar"><div class="fill" id="finalScoreFill"></div></div>
+            <div class="scoreNum" id="finalScoreNum">—</div>
+          </div>
+          <div class="small" id="scoreReason">Run “Re-score + Product Match” to compute.</div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <h2 style="margin:0;font-size:12px;font-weight:900;letter-spacing:.6px;color:var(--mx-blue);text-transform:uppercase;">POC Flow Status</h2>
+          <span class="badge">(A–E)</span>
+        </div>
+        <div style="margin-top:10px;" class="timeline" id="timeline"></div>
+      </div>
+
+      <div class="btnRow">
+        <button class="btn" id="runIngestBtn">⚙️ Agent A: Standardize</button>
+        <button class="btn warn" id="runResearchBtn">🔎 Agent B: Research</button>
+        <button class="btn good" id="runScoringBtn">🧠 Agent C: Re-score + Match</button>
+        <button class="btn secondary" id="runOutreachBtn">✉️ Agent D: Outreach</button>
+        <button class="btn" id="runProspectBtn">🧭 Agent E: Prospect</button>
+      </div>
+    </section>
+
+    <!-- Dashboard (right) -->
+    <section class="card">
+      <div class="cardHeader">
+        <div>
+          <h2>Lead Dashboard</h2>
+          <div style="margin-top:6px;font-size:12px;color:#706e6b;font-weight:700;">
+            Single pane of glass inside Salesforce
+          </div>
+        </div>
+        <div class="tabs" id="tabs">
+          <div class="tab active" data-tab="insights">Company & Applications</div>
+          <div class="tab" data-tab="products">Product Matching</div>
+          <div class="tab" data-tab="people">Decision Makers</div>
+          <div class="tab" data-tab="outreach">Outreach</div>
+          <div class="tab" data-tab="prospecting">Prospecting (Agent E)</div>
+          <div class="tab" data-tab="audit">Agent Audit</div>
+        </div>
+      </div>
+
+      <div class="cardBody" id="tabContent"></div>
+      <div class="btnRow" id="contextButtons"></div>
+    </section>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar">
+    <section class="card" id="sidebarLeadList">
+      <div class="cardHeader">
+        <div><h2>Leads (Pardot + Manual)</h2></div>
+        <span class="badge">Lead</span>
+      </div>
+      <div class="cardBody" style="padding:0;">
+        <div class="sideTableWrap">
+          <table class="sideTable" aria-label="Leads list">
+            <thead>
+              <tr>
+                <th>lead</th>
+                <th>from where</th>
+                <th>when</th>
+                <th>status</th>
+                <th>initial score</th>
+                <th>new score</th>
+              </tr>
+            </thead>
+            <tbody id="sidebarLeadsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<div class="toast" id="toast">Copied</div> id="toast">Copied</div>
+
+<script>
+/* ---------------- Core logic (same functionality as before) ---------------- */
+const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+const pct = (score)=>clamp(Math.round((score/100)*100),0,100);
+const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+const PRODUCT_CATALOG = [
+  { sku:"MLX90393", name:"MLX90393 — 3D magnetometer", mapsTo:["Motor control & position sensing for robotics joints","EV powertrain sensing & thermal monitoring","Actuation position feedback in harsh environments"] },
+  { sku:"MLX90324", name:"MLX90324 — magnetic position sensor (rotary)", mapsTo:["Motor control & position sensing for robotics joints","Functional safety sensors for braking/steering subsystems","Industrial position sensing for actuators"] },
+  { sku:"MLX91220", name:"MLX91220 — current sensor", mapsTo:["EV powertrain sensing & thermal monitoring","Industrial power monitoring & protection"] },
+  { sku:"MLX90614", name:"MLX90614 — IR temperature sensor", mapsTo:["Predictive maintenance sensing (vibration/temperature)","Thermal monitoring for electronics & power modules"] },
+  { sku:"(Select only an application)", name:"(Select only an application)", mapsTo:[] },
+];
+
+const APPLICATION_LIBRARY = [
+  "EV powertrain sensing & thermal monitoring",
+  "Functional safety sensors for braking/steering subsystems",
+  "Motor control & position sensing for robotics joints",
+  "Predictive maintenance sensing (vibration/temperature)",
+  "High-reliability pressure/temperature sensing for instrumentation",
+  "Actuation position feedback in harsh environments",
+  "Industrial position sensing for actuators",
+  "Industrial power monitoring & protection",
+  "Thermal monitoring for electronics & power modules"
+];
+
+const mockLeads = [
+  {
+    sfid: "00Q6X00000A1B2C",
+    tier: "Silver",
+    source: "Web form (Datasheet download)",
+    company: { name: "NexaMotion Robotics", domain: "nexamotion.example", country: "Germany", industry: "Industrial automation / robotics" },
+    contact: { name: "Lena Vogel", email: "lena.vogel@nexamotion.example", linkedin: "https://linkedin.com/in/lena-vogel" },
+    mc: { baseScore: 42, activity: ["Visited 7 pages", "Downloaded 2 datasheets", "Opened 1 email", "Submitted 'Contact Us' form"] }
+  },
+  {
+    sfid: "00Q6X00000D3E4F",
+    tier: "Gold",
+    source: "Event import (Electronica booth scan)",
+    company: { name: "VoltEdge Automotive", domain: "voltedge.example", country: "France", industry: "Automotive Tier-1 supplier" },
+    contact: { name: "Marc Lefèvre", email: "marc.lefevre@voltedge.example", linkedin: "" },
+    mc: { baseScore: 67, activity: ["Visited pricing page", "Downloaded 4 PDFs", "Opened 3 emails", "Booked a meeting slot"] }
+  },
+  {
+    sfid: "00Q6X00000G5H6I",
+    tier: "Bronze",
+    source: "Manual entry (Sales referral)",
+    company: { name: "AeroSense Labs", domain: "aerosense.example", country: "Netherlands", industry: "Aerospace sensing & instrumentation" },
+    contact: { name: "Sofia Janssen", email: "sofia.janssen@aerosense.example", linkedin: "https://linkedin.com/in/sofia-janssen" },
+    mc: { baseScore: 28, activity: ["Visited 2 pages", "No downloads yet", "No email activity"] }
+  }
+  ,
+  {
+    sfid: "00Q6X00000J7K8L",
+    tier: "Gold",
+    source: "IPS simulator (Access request form via MCAE/Pardot)",
+    company: { name: "HelioDrive Systems", domain: "heliodrive.example", country: "Germany", industry: "Robotics / motion control" },
+    contact: { name: "Jonas Richter", email: "jonas.richter@heliodrive.example", linkedin: "" },
+    mc: { baseScore: 80, activity: ["Requested IPS simulator access", "Visited 9 pages", "Downloaded 1 application note", "Opened 2 emails"] }
+  },
+  {
+    sfid: "00Q6X00000M9N0P",
+    tier: "Silver",
+    source: "Web form (IPS simulator — follow-up / generated)",
+    company: { name: "Orion Mobility", domain: "orionmobility.example", country: "France", industry: "Automotive electronics / EV subsystems" },
+    contact: { name: "Camille Dubois", email: "camille.dubois@orionmobility.example", linkedin: "" },
+    mc: { baseScore: 58, activity: ["Visited 5 pages", "Requested IPS simulator info", "Downloaded 2 datasheets", "Clicked 1 email CTA"] }
+  }
+];
+
+const state = {
+  lead: null,
+  steps: { captured:true, standardized:false, researched:false, scored:false, outreach:false, prospecting:false },
+  outputs: { standardizedLead:null, research:null, scoring:null, outreach:null, prospecting:null, audit:[] },
+  ui: { tab: "insights" }
+};
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 1200);
+}
+function copy(text){
+  navigator.clipboard.writeText(text).then(()=>toast("Copied to clipboard"));
+}
+function pushAudit(agent, action, payload){
+  state.outputs.audit.unshift({ ts: new Date().toLocaleString(), agent, action, payload });
+}
+function confClass(c){
+  if(c >= 0.75) return "good";
+  if(c >= 0.5) return "warn";
+  return "bad";
+}
+function setScoreUI(base, final){
+  document.getElementById("baseScoreNum").textContent = `${base}/100`;
+  document.getElementById("baseScoreFill").style.width = pct(base) + "%";
+
+  if(final == null){
+    document.getElementById("finalScoreNum").textContent = "—";
+    document.getElementById("finalScoreFill").style.width = "0%";
+    document.getElementById("finalScoreNumHL").textContent = "—";
+  }else{
+    document.getElementById("finalScoreNum").textContent = `${final}/100`;
+    document.getElementById("finalScoreFill").style.width = pct(final) + "%";
+    document.getElementById("finalScoreNumHL").textContent = `${final}/100`;
+  }
+}
+function pill(html){
+  const d = document.createElement("div");
+  d.className = "pill";
+  d.innerHTML = html;
+  return d;
+}
+function renderLeadHeader(){
+  const L = state.lead;
+  document.getElementById("sfIdBadge").textContent = `SFID: ${L.sfid}`;
+  document.getElementById("recordTitle").textContent = `${L.company.name} — ${L.contact.name}`;
+  document.getElementById("companyNameHL").textContent = L.company.name;
+  document.getElementById("tierHL").textContent = L.tier;
+
+  document.getElementById("companyName").textContent = L.company.name;
+  document.getElementById("contactName").textContent = L.contact.name;
+  document.getElementById("contactEmail").textContent = L.contact.email;
+  document.getElementById("leadSource").textContent = L.source;
+  document.getElementById("country").textContent = L.company.country;
+  document.getElementById("tier").textContent = L.tier;
+
+  const pills = document.getElementById("leadPills");
+  pills.innerHTML = "";
+  pills.appendChild(pill(`Tier: <b>${L.tier}</b>`));
+  pills.appendChild(pill(`Industry: <b>${L.company.industry}</b>`));
+  pills.appendChild(pill(`Domain: <b>${L.company.domain}</b>`));
+  pills.appendChild(pill(`MCAE events: <b>${L.mc.activity.length}</b>`));
+
+  setScoreUI(L.mc.baseScore, state.outputs.scoring?.finalScore ?? null);
+}
+function renderTimeline(){
+  const tl = document.getElementById("timeline");
+  const s = state.steps;
+  const entries = [
+    { key:"captured", title:"0) Lead captured", desc:"Website forms / event uploads / MCAE / manual / social import" },
+    { key:"standardized", title:"1) Standardization & scoring (A + MCAE)", desc:"Normalize lead object + base Pardot score" },
+    { key:"researched", title:"2) AI research & enrichment (B)", desc:"Infer applications + sources + roadmap hints" },
+    { key:"scored", title:"3) Re-score & product recommendation (C)", desc:"Correct score + map apps to products" },
+    { key:"outreach", title:"4) Decision makers & outreach (D)", desc:"Roles/names + email + LinkedIn drafts" },
+    { key:"prospecting", title:"E) Reverse prospecting (E)", desc:"Product/application → companies + sources → decision makers → outreach" },
+  ];
+  tl.innerHTML = "";
+  entries.forEach(e=>{
+    const div = document.createElement("div");
+    div.className = "step " + (s[e.key] ? "done" : "");
+    div.innerHTML = `
+      <div class="dot"></div>
+      <div>
+        <p class="t">${e.title}</p>
+        <p class="d">${e.desc}</p>
+      </div>
+    `;
+    tl.appendChild(div);
+  });
+
+  // Path stages (simple mapping)
+  setStageUI();
+}
+function setStageUI(){
+  const a = document.getElementById("stageDiscovery");
+  const b = document.getElementById("stageResearch");
+  const c = document.getElementById("stageScore");
+  const d = document.getElementById("stageOutreach");
+  const e = document.getElementById("stageDone");
+  [a,b,c,d,e].forEach(x=>x.classList.remove("active","done"));
+
+  if(state.steps.outreach || state.steps.prospecting){
+    a.classList.add("done"); b.classList.add("done"); c.classList.add("done"); d.classList.add("done"); e.classList.add("active");
+  } else if(state.steps.scored){
+    a.classList.add("done"); b.classList.add("done"); c.classList.add("active");
+  } else if(state.steps.researched){
+    a.classList.add("done"); b.classList.add("active");
+  } else {
+    a.classList.add("active");
+  }
+}
+
+
+/* ---------- Sidebar lead list (replaces old right panels) ---------- */
+const SIDEBAR_WHEN = ["Feb 2","Feb 5","Feb 7","Feb 9","Feb 12"];
+
+function leadFromWhere(L){
+  const s = (L.source || "").toLowerCase();
+  if(s.includes("ips")) return "IPS simulator";
+  if(s.includes("web form")) return "generated";
+  if(s.includes("event")) return "event";
+  return "manual";
+}
+
+function renderSidebarLeads(){
+  const tbody = document.getElementById("sidebarLeadsTbody");
+  if(!tbody) return;
+
+  tbody.innerHTML = "";
+  mockLeads.forEach((L, i)=>{
+    const isSelected = (state.lead === L);
+
+    const status = (isSelected && state.steps.researched) ? "enriched" : "not enriched";
+    const base = L.mc?.baseScore ?? 0;
+
+    let delta = "";
+    if(isSelected && state.outputs.scoring?.finalScore != null){
+      const d = state.outputs.scoring.finalScore - base;
+      delta = (d >= 0 ? `+${d}` : String(d));
+    }
+
+    const tr = document.createElement("tr");
+    if(isSelected) tr.classList.add("selected");
+    tr.innerHTML = `
+      <td>${L.company.name} — ${L.contact.name}</td>
+      <td>${leadFromWhere(L)}</td>
+      <td>${SIDEBAR_WHEN[i % SIDEBAR_WHEN.length]}</td>
+      <td><span class="statusPill ${status === "enriched" ? "ok" : ""}">${status}</span></td>
+      <td>${base}</td>
+      <td>${delta ? `<span class="deltaPlus">${delta}</span>` : "—"}</td>
+    `;
+    tr.addEventListener("click", ()=> setLead(i));
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------- Tab rendering ---------- */
+function renderTabs(){
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.classList.toggle("active", t.dataset.tab === state.ui.tab);
+  });
+  renderTabContent();
+  renderContextButtons();
+}
+
+function renderInsights(){
+  const body = document.getElementById("tabContent");
+  const L = state.lead;
+  const standardized = state.outputs.standardizedLead;
+  const research = state.outputs.research;
+
+  body.innerHTML = `
+    <div class="twoCol">
+      <div class="item">
+        <div class="itemTop">
+          <div class="title">Company snapshot</div>
+          <span class="conf ${state.steps.standardized ? "good":"warn"}">
+            ${state.steps.standardized ? "Standardized (Agent A)" : "Not standardized yet"}
+          </span>
+        </div>
+        <div class="note">
+          <b>${L.company.name}</b> • ${L.company.industry} • ${L.company.country}<br/>
+          Domain: <span class="mono">${L.company.domain}</span>
+        </div>
+        <div class="hr"></div>
+        <div class="note"><b>MCAE activity</b></div>
+        <div class="mono">- ${L.mc.activity.join("\n- ")}</div>
+        ${standardized ? `
+          <div class="hr"></div>
+          <div class="note"><b>Standardized fields (example)</b></div>
+          <div class="mono">${JSON.stringify(standardized, null, 2)}</div>
+        ` : `
+          <div class="hr"></div>
+          <div class="note">Run <b>Agent A</b> to normalize lead fields.</div>
+        `}
+      </div>
+
+      <div class="item">
+        <div class="itemTop">
+          <div class="title">Inferred applications</div>
+          <span class="conf ${state.steps.researched ? "good":"warn"}">
+            ${state.steps.researched ? "Ready (Agent B)" : "Click “Agent B: Research”"}
+          </span>
+        </div>
+
+        ${research ? `
+          <div class="list">
+            ${research.applications.map(app=>`
+              <div class="item">
+                <div class="itemTop" style="margin-bottom:4px;">
+                  <div class="title">${app.name}</div>
+                  <span class="conf ${confClass(app.confidence)}">confidence ${(app.confidence*100).toFixed(0)}%</span>
+                </div>
+                <div class="note">${app.rationale}</div>
+              </div>
+            `).join("")}
+          </div>
+        ` : `
+          <div class="note">Agent B output: applications + sources + roadmaps.</div>
+        `}
+      </div>
+    </div>
+
+    ${research ? `
+      <div class="hr"></div>
+      <div class="item">
+        <div class="itemTop">
+          <div class="title">Sources used for inference (mocked)</div>
+          <span class="conf good">Explainable</span>
+        </div>
+        <div class="list">
+          ${research.sources.map(s=>`
+            <div class="item">
+              <div class="itemTop" style="margin-bottom:4px;">
+                <div class="title">${s.title}</div>
+                <span class="badge">${s.type}</span>
+              </div>
+              <div class="note"><span class="mono">${s.url}</span></div>
+              <div class="note" style="margin-top:6px;">Key excerpt: <span class="mono">${s.excerpt}</span></div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="item">
+        <div class="itemTop">
+          <div class="title">Suggested roadmaps (per application)</div>
+          <span class="conf good">Actionable</span>
+        </div>
+        <div class="list">
+          ${research.roadmaps.map(r=>`
+            <div class="item">
+              <div class="itemTop" style="margin-bottom:4px;">
+                <div class="title">${r.application}</div>
+                <span class="badge">${r.horizon}</span>
+              </div>
+              <div class="mono">${r.steps.join("\n")}</div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    ` : ``}
+  `;
+}
+
+function renderProducts(){
+  const body = document.getElementById("tabContent");
+  const scoring = state.outputs.scoring;
+
+  body.innerHTML = `
+    <div class="item">
+      <div class="itemTop">
+        <div class="title">Product matching</div>
+        <span class="conf ${state.steps.scored ? "good":"warn"}">
+          ${state.steps.scored ? "Ready (Agent C)" : "Run “Agent C: Re-score + Match”"}
+        </span>
+      </div>
+
+      ${scoring ? `
+        <div class="note">Corrected lead priority + mapped product families.</div>
+        <div class="hr"></div>
+        <div class="note"><b>Reasoning summary</b></div>
+        <div class="mono">${scoring.reasoning}</div>
+
+        <div class="hr"></div>
+        <div class="note"><b>Suggested product families & example part numbers (mocked)</b></div>
+        <div class="list">
+          ${scoring.matches.map(m=>`
+            <div class="item">
+              <div class="itemTop" style="margin-bottom:4px;">
+                <div class="title">${m.application}</div>
+                <span class="conf ${confClass(m.confidence)}">confidence ${(m.confidence*100).toFixed(0)}%</span>
+              </div>
+              <div class="note"><b>Families:</b> ${m.families.join(", ")}</div>
+              <div class="note"><b>Example parts:</b> <span class="mono">${m.parts.join(", ")}</span></div>
+              <div class="note" style="margin-top:6px;">Why: ${m.why}</div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `
+        <div class="note">Run Agent C to compute corrected score + product suggestions.</div>
+      `}
+    </div>
+  `;
+}
+
+function renderPeople(){
+  const body = document.getElementById("tabContent");
+  const outreach = state.outputs.outreach;
+
+  body.innerHTML = `
+    <div class="item">
+      <div class="itemTop">
+        <div class="title">Likely decision makers & influencers</div>
+        <span class="conf ${state.steps.outreach ? "good":"warn"}">
+          ${state.steps.outreach ? "Ready (Agent D)" : "Run “Agent D: Outreach”"}
+        </span>
+      </div>
+
+      ${outreach ? `
+        <div class="note">Suggested roles (and example names where possible).</div>
+        <div class="hr"></div>
+        <div class="list">
+          ${outreach.people.map(p=>`
+            <div class="item">
+              <div class="itemTop" style="margin-bottom:4px;">
+                <div class="title">${p.role}</div>
+                <span class="badge">${p.seniority}</span>
+              </div>
+              <div class="note"><b>Targets:</b> ${p.targets.map(t=> t.name ? `${t.name} (${t.title})` : `${t.title}`).join(" • ")}</div>
+              <div class="note" style="margin-top:6px;">Why: ${p.why}</div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `
+        <div class="note">Run Agent D to generate decision makers + outreach artifacts.</div>
+      `}
+    </div>
+  `;
+}
+
+function renderOutreach(){
+  const body = document.getElementById("tabContent");
+  const outreach = state.outputs.outreach;
+
+  body.innerHTML = `
+    <div class="item">
+      <div class="itemTop">
+        <div class="title">Email draft + LinkedIn strategy</div>
+        <span class="conf ${state.steps.outreach ? "good":"warn"}">
+          ${state.steps.outreach ? "Ready (Agent D)" : "Run “Agent D: Outreach”"}
+        </span>
+      </div>
+
+      ${outreach ? `
+        <div class="hr"></div>
+        <div class="note"><b>Initial outreach email</b></div>
+        <div class="mono" id="emailDraft">${outreach.email}</div>
+        <div class="copyRow">
+          <button class="copyBtn" onclick="copy(document.getElementById('emailDraft').innerText)">Copy email</button>
+        </div>
+
+        <div class="hr"></div>
+        <div class="note"><b>LinkedIn connection requests</b></div>
+        <div class="list">
+          ${outreach.linkedin.map(l=>`
+            <div class="item">
+              <div class="itemTop" style="margin-bottom:4px;">
+                <div class="title">${l.target}</div>
+                <span class="badge">${l.type}</span>
+              </div>
+              <div class="mono" id="li_${l.id}">${l.message}</div>
+              <div class="copyRow">
+                <button class="copyBtn" onclick="copy(document.getElementById('li_${l.id}').innerText)">Copy message</button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `
+        <div class="note">Run Agent D to generate an initial email + LinkedIn strategy.</div>
+      `}
+    </div>
+  `;
+}
+
+function renderProspecting(){
+  const body = document.getElementById("tabContent");
+  const out = state.outputs.prospecting;
+
+  body.innerHTML = `
+    <div class="item">
+      <div class="itemTop">
+        <div class="title">Agent E — Reverse prospecting</div>
+        <span class="conf ${state.steps.prospecting ? "good":"warn"}">
+          ${state.steps.prospecting ? "Results ready" : "Select inputs & run Agent E"}
+        </span>
+      </div>
+
+      <div class="note">
+        Select a <b>Melexis product</b> or <b>application</b>, then generate:
+        companies + roadmaps + sources + decision makers + outreach.
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="grid2">
+        <div class="kv">
+          <div class="k">Select Melexis product</div>
+          <div class="v">
+            <select id="productSelectE" class="select"></select>
+          </div>
+          <div class="small" style="margin-top:6px;">Product auto-suggests an application.</div>
+        </div>
+
+        <div class="kv">
+          <div class="k">Select application</div>
+          <div class="v">
+            <select id="appSelectE" class="select"></select>
+          </div>
+          <div class="small" style="margin-top:6px;">Override if needed.</div>
+        </div>
+      </div>
+
+      <div class="copyRow" style="margin-top:12px;">
+        <button class="btn" id="runAgentEInline">🧭 Run Agent E: Find Companies</button>
+        ${out ? `<button class="btn secondary" onclick="copy(JSON.stringify(state.outputs.prospecting, null, 2))">📌 Copy Agent E JSON</button>` : ``}
+      </div>
+
+      ${out ? `
+        <div class="hr"></div>
+
+        <div class="item">
+          <div class="itemTop">
+            <div class="title">Sources used (mocked)</div>
+            <span class="conf good">Explainable</span>
+          </div>
+          <div class="list">
+            ${out.sources.map(s=>`
+              <div class="item">
+                <div class="itemTop" style="margin-bottom:4px;">
+                  <div class="title">${s.title}</div>
+                  <span class="badge">${s.type}</span>
+                </div>
+                <div class="note"><span class="mono">${s.url}</span></div>
+                <div class="note" style="margin-top:6px;">Signal: <span class="mono">${s.excerpt}</span></div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="item">
+          <div class="itemTop">
+            <div class="title">Company shortlist (mocked)</div>
+            <span class="conf good">Results</span>
+          </div>
+
+          <div class="list">
+            ${out.companies.map((c, idx)=>`
+              <div class="item">
+                <div class="itemTop" style="margin-bottom:4px;">
+                  <div class="title">${c.name}</div>
+                  <span class="conf ${confClass(c.confidence)}">confidence ${(c.confidence*100).toFixed(0)}%</span>
+                </div>
+                <div class="note"><b>Country:</b> ${c.country} • <b>Industry:</b> ${c.industry}</div>
+                <div class="note" style="margin-top:6px;"><b>Why it matches:</b> ${c.why}</div>
+
+                <div class="hr"></div>
+
+                <div class="note"><b>Likely roadmap</b> <span class="badge">${c.roadmap.horizon}</span></div>
+                <div class="mono">${c.roadmap.steps.join("\n")}</div>
+
+                <div class="hr"></div>
+
+                <div class="note"><b>Decision makers to target</b></div>
+                <div class="list">
+                  ${c.people.map(p=>`
+                    <div class="item">
+                      <div class="itemTop" style="margin-bottom:4px;">
+                        <div class="title">${p.role}</div>
+                        <span class="badge">${p.seniority}</span>
+                      </div>
+                      <div class="note"><b>Targets:</b> ${p.targets.map(t=> t.name ? `${t.name} (${t.title})` : `${t.title}`).join(" • ")}</div>
+                      <div class="note" style="margin-top:6px;">Why: ${p.why}</div>
+                    </div>
+                  `).join("")}
+                </div>
+
+                <div class="hr"></div>
+
+                <div class="note"><b>Draft outreach (email)</b></div>
+                <div class="mono" id="e_mail_${idx}">${c.outreach.email}</div>
+                <div class="copyRow">
+                  <button class="copyBtn" onclick="copy(document.getElementById('e_mail_${idx}').innerText)">Copy email</button>
+                </div>
+
+                <div class="note" style="margin-top:10px;"><b>LinkedIn connect draft</b></div>
+                <div class="mono" id="e_li_${idx}">${c.outreach.linkedin}</div>
+                <div class="copyRow">
+                  <button class="copyBtn" onclick="copy(document.getElementById('e_li_${idx}').innerText)">Copy LinkedIn message</button>
+                  <button class="btn secondary" onclick="createLeadFromProspect(${idx})">➕ Create Lead</button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      ` : ``}
+    </div>
+  `;
+
+  const productSel = document.getElementById("productSelectE");
+  const appSel = document.getElementById("appSelectE");
+
+  if(productSel && !productSel.dataset.ready){
+    PRODUCT_CATALOG.forEach((p)=>{
+      const opt = document.createElement("option");
+      opt.value = p.sku;
+      opt.textContent = p.name;
+      productSel.appendChild(opt);
+    });
+    productSel.dataset.ready = "1";
+    productSel.addEventListener("change", ()=>{
+      const sku = productSel.value;
+      const p = PRODUCT_CATALOG.find(x=>x.sku===sku);
+      if(p && p.mapsTo.length){
+        appSel.value = p.mapsTo[0];
+        toast("Application auto-suggested");
+      }
+    });
+  }
+
+  if(appSel && !appSel.dataset.ready){
+    APPLICATION_LIBRARY.forEach((a)=>{
+      const opt = document.createElement("option");
+      opt.value = a;
+      opt.textContent = a;
+      appSel.appendChild(opt);
+    });
+    appSel.dataset.ready = "1";
+  }
+
+  const runInline = document.getElementById("runAgentEInline");
+  if(runInline) runInline.onclick = runProspecting;
+}
+
+function renderAudit(){
+  const body = document.getElementById("tabContent");
+  const audit = state.outputs.audit;
+
+  body.innerHTML = `
+    <div class="item">
+      <div class="itemTop">
+        <div class="title">Agent audit trail (mock)</div>
+        <span class="conf good">Explainable</span>
+      </div>
+      <div class="note">Actions produced by agents A–E.</div>
+      <div class="hr"></div>
+      ${audit.length ? `
+        <div class="list">
+          ${audit.slice(0,12).map(a=>`
+            <div class="item">
+              <div class="itemTop">
+                <div class="title">${a.agent} — ${a.action}</div>
+                <span class="badge">${a.ts}</span>
+              </div>
+              <div class="mono">${JSON.stringify(a.payload, null, 2)}</div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="note">No agent actions yet.</div>`}
+    </div>
+  `;
+}
+
+function renderTabContent(){
+  switch(state.ui.tab){
+    case "insights": return renderInsights();
+    case "products": return renderProducts();
+    case "people": return renderPeople();
+    case "outreach": return renderOutreach();
+    case "prospecting": return renderProspecting();
+    case "audit": return renderAudit();
+  }
+}
+
+function renderContextButtons(){
+  const row = document.getElementById("contextButtons");
+  const tab = state.ui.tab;
+  const btns = [];
+
+  if(tab === "insights"){
+    btns.push({label:"🔎 Run Company Research (Agent B)", cls:"btn warn", on:runResearch});
+    btns.push({label:"⚙️ Standardize Lead (Agent A)", cls:"btn", on:runIngest});
+  }
+  if(tab === "products"){
+    btns.push({label:"🧠 Re-score + Product Match (Agent C)", cls:"btn good", on:runScoring});
+  }
+  if(tab === "people"){
+    btns.push({label:"👥 Generate Decision Makers (Agent D)", cls:"btn secondary", on:runOutreach});
+  }
+  if(tab === "outreach"){
+    btns.push({label:"✉️ Generate Email + LinkedIn (Agent D)", cls:"btn secondary", on:runOutreach});
+  }
+  if(tab === "prospecting"){
+    btns.push({label:"🧭 Run Agent E: Find Companies", cls:"btn", on:runProspecting});
+    btns.push({label:"📌 Copy Agent E JSON", cls:"btn secondary", on:()=> state.outputs.prospecting ? copy(JSON.stringify(state.outputs.prospecting, null, 2)) : toast("Run Agent E first")});
+  }
+  if(tab === "audit"){
+    btns.push({label:"📌 Export Audit JSON (copy)", cls:"btn secondary", on:()=>copy(JSON.stringify(state.outputs.audit, null, 2))});
+  }
+
+  row.innerHTML = "";
+  btns.forEach(b=>{
+    const el = document.createElement("button");
+    el.className = b.cls;
+    el.textContent = b.label;
+    el.onclick = b.on;
+    row.appendChild(el);
+  });
+}
+
+/* ---------- Agents (A–E) ---------- */
+const running = { standardized:false, researched:false, scored:false, outreach:false, prospecting:false };
+function markRunning(key, isRunning){
+  running[key] = isRunning;
+  renderTimeline();
+  const tl = document.getElementById("timeline");
+  const map = { standardized:1, researched:2, scored:3, outreach:4, prospecting:5 };
+  if(tl.children[map[key]]) tl.children[map[key]].classList.toggle("running", isRunning);
+}
+
+async function runIngest(){
+  if(state.steps.standardized) return toast("Agent A already ran");
+  markRunning("standardized", true);
+  await sleep(500);
+
+  const L = state.lead;
+  const standardized = {
+    leadType: "StandardizedLead",
+    tier: L.tier,
+    source: L.source,
+    companyNameClean: L.company.name.trim(),
+    domain: L.company.domain.toLowerCase(),
+    country: L.company.country,
+    mappedIndustry: L.company.industry,
+    unifiedContact: { name: L.contact.name, email: L.contact.email.toLowerCase(), linkedinUrl: L.contact.linkedin || null },
+    status: "Open - New"
+  };
+
+  state.outputs.standardizedLead = standardized;
+  state.steps.standardized = true;
+  pushAudit("Agent A", "Standardized lead record", standardized);
+
+  markRunning("standardized", false);
+  refreshAll();
+  toast("Agent A complete");
+}
+
+async function runResearch(){
+  if(state.steps.researched) return toast("Agent B already ran");
+  markRunning("researched", true);
+  await sleep(600);
+
+  const L = state.lead;
+  const sources = [
+    { type: "Company site", title: `${L.company.name} — Product overview`, url: `https://${L.company.domain}/products`, excerpt: "Mentions sensing, efficiency, embedded control requirements." },
+    { type: "Jobs", title: `${L.company.name} — Careers listing`, url: `https://${L.company.domain}/careers`, excerpt: "Hiring for sensor integration, safety requirements, embedded roles." },
+    { type: "Press", title: `${L.company.name} — News/press`, url: `https://${L.company.domain}/news`, excerpt: "Roadmap language around platforms and prototypes." }
+  ];
+
+  const appTemplates = inferApplications(L.company.industry);
+
+  const roadmaps = appTemplates.map(a=>({
+    application: a.name,
+    horizon: "12–24 months",
+    steps: [
+      "0–3 months: Requirements + architecture selection",
+      "3–9 months: Sensor evaluation + prototype validation",
+      "9–18 months: Design-in + qualification",
+      "18–24 months: Pilot → ramp + supplier consolidation"
+    ]
+  }));
+
+  const research = { applications: appTemplates, sources, roadmaps, generatedBy: "Agent B (mocked)" };
+  state.outputs.research = research;
+  state.steps.researched = true;
+  pushAudit("Agent B", "Company research + application inference", research);
+
+  markRunning("researched", false);
+  refreshAll();
+  toast("Agent B complete");
+}
+
+async function runScoring(){
+  if(state.steps.scored) return toast("Agent C already ran");
+  markRunning("scored", true);
+  await sleep(550);
+
+  const L = state.lead;
+  const base = L.mc.baseScore;
+  const apps = state.outputs.research?.applications ?? [];
+
+  const fitBoost = apps.length ? Math.round(apps.reduce((acc,a)=>acc + (a.confidence*12),0)) : 0;
+  const tierBoost = (L.tier === "Gold") ? 10 : (L.tier === "Silver") ? 5 : 0;
+  const intentBoost = L.mc.activity.join(" ").toLowerCase().includes("booked") ? 12 : 0;
+
+  const finalScore = clamp(base + fitBoost + tierBoost + intentBoost, 0, 100);
+
+  const matches = (apps.length ? apps : [{name:"General sensing opportunity", confidence:0.45, rationale:"Limited data; run Agent B for better fit."}])
+    .map((a, idx)=> productMatch(a.name, a.confidence, idx));
+
+  const reasoning =
+`Base score (MCAE): ${base}
++ Tier boost (${L.tier}): ${tierBoost}
++ Fit boost (Agent B): ${fitBoost}
++ Intent boost: ${intentBoost}
+= Final corrected score: ${finalScore}`;
+
+  const scoring = { finalScore, matches, reasoning, generatedBy:"Agent C (mocked)" };
+  state.outputs.scoring = scoring;
+  state.steps.scored = true;
+  pushAudit("Agent C", "Corrected score + product matching", scoring);
+
+  markRunning("scored", false);
+  refreshAll();
+  toast("Agent C complete");
+}
+
+async function runOutreach(){
+  if(state.steps.outreach) return toast("Agent D already ran");
+  markRunning("outreach", true);
+  await sleep(650);
+
+  const L = state.lead;
+  const apps = state.outputs.research?.applications ?? [];
+  const topApp = apps[0]?.name || "your sensing roadmap";
+  const topFamilies = state.outputs.scoring?.matches?.[0]?.families?.slice(0,2)?.join(" & ") || "Melexis sensing solutions";
+
+  const people = inferDecisionMakers(L.company.industry, topApp);
+
+  const email =
+`Subject: Exploring ${topApp} — quick alignment on sensing needs?
+
+Hi ${L.contact.name.split(" ")[0]},
+
+I’m reaching out from Melexis. Based on public signals and recent engagement, it looks like ${topApp} could be relevant.
+
+If helpful, we can share options around ${topFamilies}—typical architectures, evaluation guidance, and design-in support.
+
+Would a 20-minute call next week make sense to confirm constraints, timeline, and stakeholders?
+
+Best regards,
+[Your Name]
+Melexis | [Title]
+[Phone] | [Email]`;
+
+  const linkedin = [
+    {
+      id:"a1",
+      type:"Connection request",
+      target: people[0]?.targets?.[0]?.name ? people[0].targets[0].name : "Head of Engineering / Systems",
+      message: `Hi — I work with Melexis on sensing solutions. Happy to share a short evaluation/architecture summary for ${topApp} if relevant.`
+    },
+    {
+      id:"b2",
+      type:"Connection request",
+      target: people[1]?.targets?.[0]?.name ? people[1].targets[0].name : "Product / Program lead",
+      message: `Hi — would love to connect and see if Melexis can support evaluation and design-in for ${topApp}.`
+    }
+  ];
+
+  const out = { people, email, linkedin, generatedBy:"Agent D (mocked)" };
+  state.outputs.outreach = out;
+  state.steps.outreach = true;
+  pushAudit("Agent D", "Decision makers + email + LinkedIn strategy", out);
+
+  markRunning("outreach", false);
+  refreshAll();
+  toast("Agent D complete");
+}
+
+async function runProspecting(){
+  if(state.steps.prospecting) return toast("Agent E already ran (reset to rerun)");
+  state.ui.tab = "prospecting";
+  renderTabs();
+  renderSidebarLeads();
+
+  const productSel = document.getElementById("productSelectE");
+  const appSel = document.getElementById("appSelectE");
+  const productSku = productSel?.value || PRODUCT_CATALOG[0].sku;
+  const application = appSel?.value || (PRODUCT_CATALOG.find(p=>p.sku===productSku)?.mapsTo?.[0] ?? APPLICATION_LIBRARY[0]);
+  const product = PRODUCT_CATALOG.find(p=>p.sku===productSku)?.name || productSku;
+
+  markRunning("prospecting", true);
+  await sleep(750);
+
+  const sources = [
+    { type:"Job posts", title:"Signals of sensor integration hiring", url:"https://jobs.example/search?s=sensor+integration", excerpt:"Roles indicate active R&D and evaluation windows." },
+    { type:"Press releases", title:"Prototype / platform announcements", url:"https://press.example/search?q=prototype+platform", excerpt:"Platform launches correlate with supplier selection cycles." },
+    { type:"Product pages", title:"Application-specific product marketing", url:"https://catalog.example/search?q=application", excerpt:"Keywords align to target application requirements." }
+  ];
+
+  const rawCompanies = inferProspectCompanies(application);
+
+  const companies = rawCompanies.map((c, idx)=>{
+    const roadmap = makeRoadmap(application, c.horizonHint);
+    const people = inferDecisionMakers(c.industry, application);
+
+    const email =
+`Subject: ${application} — quick alignment on sensing approach?
+
+Hi [Name],
+
+I’m reaching out from Melexis. Based on public signals, it looks like ${c.name} may be active in ${application}.
+
+If useful, we can share evaluation guidance and options for ${productSku} (or related families), depending on your constraints.
+
+Would a short 20-minute call next week make sense?
+
+Best regards,
+[Your Name]
+Melexis | [Title]
+[Phone] | [Email]`;
+
+    const li =
+`Hi — I work with Melexis on sensing solutions. Reaching out because your team appears active in ${application}. Happy to share a short evaluation/architecture summary if helpful.`;
+
+    return {
+      name: c.name,
+      country: c.country,
+      industry: c.industry,
+      confidence: clamp(c.confidence - idx*0.04, 0.35, 0.88),
+      why: c.why,
+      roadmap,
+      people,
+      outreach: { email, linkedin: li }
+    };
+  });
+
+  const out = { product, productSku, application, sources, companies, generatedBy:"Agent E (mocked)" };
+  state.outputs.prospecting = out;
+  state.steps.prospecting = true;
+  pushAudit("Agent E", "Reverse prospecting: product/application → companies + sources + outreach", out);
+
+  markRunning("prospecting", false);
+  refreshAll();
+  toast("Agent E complete");
+}
+
+function createLeadFromProspect(idx){
+  const out = state.outputs.prospecting;
+  if(!out) return toast("Run Agent E first");
+  const c = out.companies[idx];
+
+  const newLead = {
+    sfid: "00Q6X00000" + Math.random().toString(36).slice(2, 8).toUpperCase(),
+    tier: "Silver",
+    source: "Agent E prospecting (outbound shortlist)",
+    company: {
+      name: c.name,
+      domain: (c.name.toLowerCase().replace(/[^a-z0-9]+/g,"").slice(0,14) || "company") + ".example",
+      country: c.country,
+      industry: c.industry
+    },
+    contact: { name: "— (to be discovered)", email: "—", linkedin: "" },
+    mc: { baseScore: 0, activity: ["Outbound prospect: no MCAE history yet"] }
+  };
+
+  mockLeads.unshift(newLead);
+  repopulateLeadPicker(0);
+  setLead(0);
+
+  pushAudit("Agent E", "Created Salesforce lead from prospect shortlist", { sfid: newLead.sfid, company: newLead.company.name, application: out.application, productSku: out.productSku });
+  refreshAll();
+  toast("Lead created (mock)");
+}
+
+/* ---------- Mock helpers ---------- */
+function inferApplications(industry){
+  const s = industry.toLowerCase();
+  if(s.includes("automotive")){
+    return [
+      { name:"EV powertrain sensing & thermal monitoring", confidence:0.82, rationale:"Tier-1 + EV stacks imply current/temperature/position needs." },
+      { name:"Functional safety sensors for braking/steering subsystems", confidence:0.68, rationale:"ASIL-aligned sensing and diagnostics are common." }
+    ];
+  }
+  if(s.includes("robot") || s.includes("automation")){
+    return [
+      { name:"Motor control & position sensing for robotics joints", confidence:0.78, rationale:"Robotics requires precise position sensing and robustness." },
+      { name:"Predictive maintenance sensing (vibration/temperature)", confidence:0.56, rationale:"Condition monitoring is common in industrial automation." }
+    ];
+  }
+  if(s.includes("aero")){
+    return [
+      { name:"High-reliability pressure/temperature sensing for instrumentation", confidence:0.66, rationale:"Instrumentation requires stability, qualification, redundancy." },
+      { name:"Actuation position feedback in harsh environments", confidence:0.52, rationale:"Actuators need dependable feedback under stress." }
+    ];
+  }
+  return [{ name:"General sensing opportunity (needs discovery)", confidence:0.45, rationale:"Insufficient signal; run deeper research." }];
+}
+function productMatch(application, confidence, idx){
+  const a = application.toLowerCase();
+  let families = ["Magnetic position sensing", "Current sensing", "Temperature sensing"];
+  let parts = ["MLX9xxxx", "MLX9yyyy", "MLX9zzzz"];
+  let why = "Select parts based on range, accuracy, safety, and environment.";
+
+  if(a.includes("position") || a.includes("joint") || a.includes("actuation")){
+    families = ["Magnetic position sensors", "Rotary/linear position ICs"];
+    parts = ["MLX903xx", "MLX904xx", "MLX905xx"];
+    why = "Position feedback is central; magnetic sensing improves robustness.";
+  } else if(a.includes("thermal") || a.includes("temperature")){
+    families = ["Temperature sensors", "Infrared/thermal sensing"];
+    parts = ["MLX906xx", "MLX9Txxx"];
+    why = "Thermal monitoring supports protection and predictive maintenance.";
+  } else if(a.includes("powertrain") || a.includes("current")){
+    families = ["Current sensing", "Isolated measurement"];
+    parts = ["MLX912xx", "MLX9CSxx"];
+    why = "Current measurement enables control, diagnostics, and safety monitoring.";
+  }
+  return { application, confidence: clamp(confidence - (idx*0.05), 0.25, 0.9), families, parts, why };
+}
+function inferDecisionMakers(industry){
+  const s = industry.toLowerCase();
+  const base = [
+    { role: "Technical decision maker", seniority: "Director / Head", targets: [{ title:"Head of Engineering" }, { title:"Director of Hardware" }], why: "Owns architecture choices and shortlist." },
+    { role: "Engineering influencer", seniority: "Lead / Principal", targets: [{ title:"Principal Systems Engineer" }, { title:"Sensor Integration Lead" }], why: "Defines requirements and runs evaluation." },
+    { role: "Program / product stakeholder", seniority: "Manager", targets: [{ title:"Product Manager" }, { title:"Program Manager" }], why: "Owns milestones and tradeoffs." }
+  ];
+  if(s.includes("automotive")){
+    base[0].targets.unshift({ name:"(Example) Claire Martin", title:"Director, EE Systems" });
+    base[1].targets.unshift({ name:"(Example) Julien Petit", title:"Principal Systems Engineer" });
+  } else if(s.includes("robot")){
+    base[0].targets.unshift({ name:"(Example) Tobias Krüger", title:"Head of Robotics Engineering" });
+  } else if(s.includes("aero")){
+    base[0].targets.unshift({ name:"(Example) Noor de Vries", title:"Director, Avionics Engineering" });
+  }
+  return base;
+}
+function inferProspectCompanies(application){
+  const a = application.toLowerCase();
+  if(a.includes("ev") || a.includes("powertrain")){
+    return [
+      { name:"E-Drive Dynamics", country:"Germany", industry:"Automotive Tier-1 supplier", confidence:0.80, horizonHint:"18–30 months", why:"EV platform initiatives + power electronics hiring." },
+      { name:"VoltAxis Systems", country:"France", industry:"Automotive electronics", confidence:0.74, horizonHint:"12–24 months", why:"Thermal/current monitoring language in postings." },
+      { name:"NordicTraction", country:"Sweden", industry:"Powertrain modules", confidence:0.70, horizonHint:"12–18 months", why:"Signals of active supplier evaluation." }
+    ];
+  }
+  if(a.includes("robot") || a.includes("joint") || a.includes("position")){
+    return [
+      { name:"RoboForge Automation", country:"Germany", industry:"Industrial robotics", confidence:0.80, horizonHint:"9–18 months", why:"Joint control implies position sensing evaluation." },
+      { name:"DexterMotion", country:"Netherlands", industry:"Cobots & motion", confidence:0.74, horizonHint:"12–24 months", why:"Control + sensor fusion hiring suggests prototypes." },
+      { name:"ActuPro Systems", country:"Belgium", industry:"Industrial actuators", confidence:0.69, horizonHint:"6–15 months", why:"Actuator positioning language across products." }
+    ];
+  }
+  return [
+    { name:"OmniTech Manufacturing", country:"Germany", industry:"Industrial OEM", confidence:0.65, horizonHint:"12–24 months", why:"General signals of new platform development." },
+    { name:"NovaSystems Engineering", country:"Netherlands", industry:"Embedded systems integrator", confidence:0.60, horizonHint:"9–18 months", why:"Portfolio suggests evaluation cycles." },
+    { name:"ApexControls", country:"France", industry:"Control electronics", confidence:0.58, horizonHint:"12–18 months", why:"Control + sensing integration is typical." }
+  ];
+}
+function makeRoadmap(application, horizon){
+  return {
+    horizon: horizon || "12–24 months",
+    steps: [
+      `0–3 months: Discovery & requirements for ${application}`,
+      "3–9 months: Prototype integration + sensor evaluation",
+      "9–18 months: Design-in + validation/qualification",
+      "18–24 months: Pilot → ramp + supplier consolidation"
+    ]
+  };
+}
+
+/* ---------- Wiring ---------- */
+function refreshAll(){
+  renderLeadHeader();
+  renderTimeline();
+  renderTabs();
+  renderSidebarLeads();
+
+  const sr = document.getElementById("scoreReason");
+  if(state.outputs.scoring){
+    sr.textContent = "Computed by Agent C: behavior + fit → corrected priority score.";
+    setScoreUI(state.lead.mc.baseScore, state.outputs.scoring.finalScore);
+  }else{
+    sr.textContent = "Run “Re-score + Product Match” to compute.";
+    setScoreUI(state.lead.mc.baseScore, null);
+  }
+}
+
+function repopulateLeadPicker(selectIndex){
+  const leadSelect = document.getElementById("leadSelect");
+  leadSelect.innerHTML = "";
+  mockLeads.forEach((l, i)=>{
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = `${l.company.name} — ${l.tier} — ${l.source}`;
+    leadSelect.appendChild(opt);
+  });
+  leadSelect.value = String(selectIndex ?? 0);
+}
+
+function setLead(index){
+  state.lead = mockLeads[index];
+  state.steps = { captured:true, standardized:false, researched:false, scored:false, outreach:false, prospecting:false };
+  state.outputs.standardizedLead = null;
+  state.outputs.research = null;
+  state.outputs.scoring = null;
+  state.outputs.outreach = null;
+  state.outputs.prospecting = null;
+  state.outputs.audit = [];
+  state.ui.tab = "insights";
+  refreshAll();
+}
+
+function resetDemo(){
+  toast("Reset complete");
+  setLead(0);
+}
+
+/* buttons */
+document.getElementById("runIngestBtn").onclick = runIngest;
+document.getElementById("runResearchBtn").onclick = runResearch;
+document.getElementById("runScoringBtn").onclick = runScoring;
+document.getElementById("runOutreachBtn").onclick = runOutreach;
+document.getElementById("runProspectBtn").onclick = runProspecting;
+document.getElementById("runProspectBtnTop").onclick = runProspecting;
+document.getElementById("resetBtn").onclick = resetDemo;
+
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    state.ui.tab = t.dataset.tab;
+    renderTabs();
+  });
+});
+document.getElementById("leadSelect").addEventListener("change", (e)=> setLead(Number(e.target.value)));
+
+/* init */
+repopulateLeadPicker(0);
+setLead(0);
+</script>
+</body>
+</html>
